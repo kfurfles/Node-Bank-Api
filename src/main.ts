@@ -1,10 +1,12 @@
-const Hapi = require('@hapi/hapi');
-require('dotenv').config()
+import Hapi from '@hapi/hapi';
+import DotEnv from 'dotenv';
+
+DotEnv.config();
 
 const init = async () => {
   const server = Hapi.server({
     port: process.env.PORT,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   });
 
   server.route({
@@ -12,7 +14,7 @@ const init = async () => {
     path: '/',
     handler: (request, h) => {
       return 'Hello World!';
-    }
+    },
   });
 
   await server.start();
