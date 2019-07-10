@@ -8,7 +8,7 @@ module.exports = class DbRegister{
         // return `mongodb+srv://
         //         ${process.env.DB_USER}:${process.env.DB_PASSWORD}@marvelcluster-6d3ar.mongodb.net/
         //         ${process.env.DB_HOST}?retryWrites=true&w=majority`;
-        return `mongodb+srv://master:master123@marvelcluster-6d3ar.mongodb.net/omni?retryWrites=true&w=majority'`
+        return `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_HOST}?retryWrites=true&w=majority`
     }
 
     static startConnection(){
