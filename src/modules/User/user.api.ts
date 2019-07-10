@@ -1,4 +1,5 @@
 import userDAO from './user.dao'
+import accountDao from './../Account/account.dao'
 import { User } from '../../core/models/User'
 
 const create = async (req, res) =>{
@@ -11,8 +12,9 @@ const create = async (req, res) =>{
     } = req
     const newUser = new User(name, email, cpf, password)
     try {
-        const createdUser = await userDAO.createUserDAO(newUser)
-        res.status(200).json(createdUser)
+        let createdUser = await userDAO.createUserDAO(newUser)
+        const createdAccount = await accountDao.createAccountDAO(newUser)
+        res.status(200).json({ createdUser, createdAccount })
     } catch (error) {
         res.status(500).json(error)   
     }
