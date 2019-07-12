@@ -3,7 +3,7 @@ const { decrypt } = require('../../utils/encrypt')
 const { tokenGenerator } = require('../../utils/tokenGenerator')
 import requestValidators from '../../utils/requestValidators'
 const authUser = async (req, res) =>{
-    const { body: { cpf, password } } = req
+    let { body: { cpf, password } } = req
     
     const errorRespose = () => res.status(401).json({ error: 'Email or Password not correct' })
     try {
@@ -14,6 +14,8 @@ const authUser = async (req, res) =>{
             return;
         }
 
+        cpf = cpf.replace(/(\.)?(\-)?/ig,'')
+        cpf = cpf.replace(/([\d]{3})([\d]{3})([\d]{3})([\d]{2})/ig,'$1.$2.$3-$04')
         const user = await authDAO.getUserDao(cpf)
         if (!user) return errorRespose() 
         const checked = await decrypt(password, user.password)
