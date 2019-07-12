@@ -1,20 +1,22 @@
+
+const mongoose = require('mongoose');
+const randomId = () => mongoose.Types.ObjectId();
 export class Account{
-    protected idUser = ''
-    protected numberAccount = ''
-    private amount = 0
+    id: string
+    idUser: string
+    private _amount: Number
     
 
-    constructor(idUser: string, numberAccount: string, amount: number){
+    constructor(idUser: string){
         this.idUser = idUser
-        this.numberAccount = numberAccount
-        this.amount = amount
+        this._amount = 0
     }
 
-    setAmount(value: number) {
-        this.amount = value
+    set amount(value: Number) {
+        this._amount = value
     }
 
-    getAmount() : number {
-        return this.amount
+    get amount() : Number {
+        return this._amount
     }
 }

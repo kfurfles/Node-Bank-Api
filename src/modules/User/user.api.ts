@@ -13,10 +13,17 @@ const create = async (req, res) =>{
     const newUser = new User(name, email, cpf, password)
     try {
         let createdUser = await userDAO.createUserDAO(newUser)
-        const createdAccount = await accountDao.createAccountDAO(newUser)
-        res.status(200).json({ createdUser, createdAccount })
+        const createdAccount = await accountDao.createAccountDAO(createdUser)
+        createdUser = await userDAO.updateUserDAO(createdUser.id, {
+            idAccount: createdAccount.id
+        })
+        res.status(200).json(createdUser)
     } catch (error) {
-        res.status(500).json(error)   
+        if (error.errmsg) {
+            res.status(400).json(error.errmsg)
+            return;   
+        }
+        res.status(500).json(error.errmsg)   
     }
 }
 

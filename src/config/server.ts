@@ -37,7 +37,6 @@ module.exports = class Server{
     }
 
     public start(){
-        console.log(this.PORT)
         this.server.listen(this.PORT,()=>{
             console.log(`Server Listen in PORT:${this.PORT}`)
         })

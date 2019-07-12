@@ -20,7 +20,12 @@ const authUser = async (req, res) =>{
         if (!checked) {
             return errorRespose()
         } else {
-            var token = tokenGenerator({ id: user.cpf })
+            var token = tokenGenerator({ 
+                id: user.id,
+                email: user.email,
+                cpf: user.cpf,
+                idAccount:  user.idAccount
+            })
             return res.status(200).json({ token })
         }
     } catch (error) {

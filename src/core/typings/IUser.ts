@@ -3,4 +3,5 @@ export interface IUser {
     email: string
     cpf: string
     password: string
+    idAccount: string
 }

@@ -5,14 +5,14 @@ module.exports = class DbRegister{
     }
 
     static stringConnection(): String {
-        // return `mongodb+srv://
-        //         ${process.env.DB_USER}:${process.env.DB_PASSWORD}@marvelcluster-6d3ar.mongodb.net/
-        //         ${process.env.DB_HOST}?retryWrites=true&w=majority`;
         return `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_HOST}?retryWrites=true&w=majority`
     }
 
     static startConnection(){
-        mongoose.connect(this.stringConnection(), {useNewUrlParser: true});
+        mongoose.connect(this.stringConnection(), {
+            useNewUrlParser: true,
+            useFindAndModify: false
+        });
         connection.on('error', () => {
         console.log('Error in the coonection');
         process.exit(1);
