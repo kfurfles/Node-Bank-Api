@@ -2,7 +2,7 @@ export{}
 import { Launch } from '../../core/models/Launch';
 import { IRequest } from './launchs.api';
 import { ILaunch } from 'src/core/typings/ILaunch';
-const SchemaLaunch = require('./launchs.schema.ts')
+const SchemaLaunch = require('../Launchs/launchs.schema')
 
 const createLaunchUserDAO = async (idUser: string, userAccount, requestLaunchItem : IRequest) =>{
     
