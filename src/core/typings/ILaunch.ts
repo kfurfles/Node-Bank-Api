@@ -9,6 +9,7 @@ export interface ILaunchItem {
 }
 
 export interface ILaunch {
+    id: string
     idUser: String,
     amount: number,
     date: Date,

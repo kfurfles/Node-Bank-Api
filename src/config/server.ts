@@ -1,8 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-const DotEnv = require('dotenv')
-DotEnv.config();
 
 module.exports = class Server{
     PORT = parseInt(process.env.PORT)

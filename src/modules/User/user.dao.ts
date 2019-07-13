@@ -19,12 +19,17 @@ const updateUserDAO = async function(userId , newData) : Promise<User> {
     return UserSchema.findOneAndUpdate({ _id: userId },{$set: newData }, {new: true},)
 }
 
-const listUsersDAO = async (filters?) => {
+const listUsersDAO = async function(filters?) {
     return await UserSchema.find(filters)
+}
+
+const getUserById = async (id) =>{
+    return await UserSchema.findById(id)
 }
 
 export default {
     updateUserDAO,
     createUserDAO,
-    listUsersDAO
+    listUsersDAO,
+    getUserById
 }

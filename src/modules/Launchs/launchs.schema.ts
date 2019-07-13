@@ -14,16 +14,3 @@ const LaunchSchema = new Schema({
 })
 
 module.exports = mongoose.model('Launchs', LaunchSchema)
-
-// var f = [
-//     {
-//         idUser: 1,
-//         amount: 0,
-//         date: "10-10-2010",
-//         launchList: [
-//             name: "conta de luz",
-//             type: "debit",
-//             value: "2000.00",
-//         ]
-//     }
-// ]
