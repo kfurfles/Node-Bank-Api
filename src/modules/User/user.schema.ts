@@ -1,4 +1,5 @@
 export{}
+
 const mongoose = require('mongoose')
     ,Schema = mongoose.Schema;
 const UserSchema = new Schema({
@@ -6,7 +7,9 @@ const UserSchema = new Schema({
     email: { type : String , unique : true },
     cpf: { type : String , unique : true },
     password: String,
-    idAccount: String
+    account: {
+        amount: Number
+    }
 },{
     timestamps: true
 })

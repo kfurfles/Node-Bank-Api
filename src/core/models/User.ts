@@ -6,7 +6,9 @@ export class User implements IUser {
     cpf: string
     password: string
     id: string
-    idAccount: string
+    account: {
+        amount: number
+    }
     constructor(name, email, cpf, password){
         this.name = name
         this.email = email

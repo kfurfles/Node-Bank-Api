@@ -2,7 +2,7 @@ export{}
 const jwt = require('jsonwebtoken')
 
 const tokenGenerator = (payload) => {
-    return jwt.sign(payload, process.env.SECRET, { expiresIn: 180 })
+    return jwt.sign(payload, process.env.SECRET, { expiresIn: 600 })
 }
 
 const tokenValidator = (token) => {

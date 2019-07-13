@@ -7,18 +7,20 @@ const createUserDAO = async function(body: User) : Promise<User> {
     const newUser = new UserSchema({ 
         ...body,
         idAccount: '',
+        account: {
+            amount: 0
+        },
         password: encrypt.encrypt(body.password)
     })
     return await newUser.save()
 }
 
 const updateUserDAO = async function(userId , newData) : Promise<User> {
-    let updatedUser = await UserSchema.findOneAndUpdate({ _id: userId },{$set: newData }, {new: true},)
-    return updatedUser
+    return UserSchema.findOneAndUpdate({ _id: userId },{$set: newData }, {new: true},)
 }
 
-const listUsersDAO = async () => {
-    return await UserSchema.find()
+const listUsersDAO = async (filters?) => {
+    return await UserSchema.find(filters)
 }
 
 export default {
