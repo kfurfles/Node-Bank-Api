@@ -1,3 +1,4 @@
+import { newError } from '../../utils/errors';
 const authDAO = require('./auth.dao')
 const { decrypt } = require('../../utils/encrypt') 
 const { tokenGenerator } = require('../../utils/tokenGenerator')
@@ -5,16 +6,15 @@ import requestValidators from '../../utils/requestValidators'
 const authUser = async (req, res) =>{
     let { body: { cpf, password } } = req
     
-    const errorRespose = () => res.status(401).json({ error: 'Email or Password not correct' })
+    const errorRespose = () => res.status(401).json(newError({ message: 'Email or Password not correct' }))
     try {
         const validation = requestValidators(req.body,['password','cpf'])
 
         if(!validation.status){
-            res.status(400).json({ error: validation.message })
+            res.status(400).json(newError({ message: validation.message }))
             return;
         }
 
-        cpf = cpf.replace(/(\.)?(\-)?/ig,'')
         const user = await authDAO.getUserDao(cpf)
         if (!user) return errorRespose() 
         const checked = await decrypt(password, user.password)

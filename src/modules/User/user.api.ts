@@ -1,5 +1,6 @@
 import userDAO from './user.dao'
 import { User } from '../../core/models/User'
+import { newError } from '../../utils/errors';
 
 const create = async (req, res) =>{
     const { 
@@ -15,11 +16,15 @@ const create = async (req, res) =>{
         let createdUser = await userDAO.createUserDAO(newUser)
         res.status(200).json(createdUser)
     } catch (error) {
-        if (error.errmsg) {
-            res.status(400).json(error.errmsg)
+        if (error.code && error.code === 11000) {            
+            res.status(409).json(
+                newError({
+                    message: 'user already registered'
+                })
+            )
             return;   
         }
-        res.status(500).json(error.errmsg)   
+        res.status(500).json(error)   
     }
 }
 

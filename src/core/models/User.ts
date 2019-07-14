@@ -12,7 +12,7 @@ export class User implements IUser {
     constructor(name, email, cpf, password){
         this.name = name
         this.email = email
-        this.cpf = cpf
+        this.cpf = cpf.replace(/(\.)?(\-)?/ig,'')
         this.password = password
     }
 }
