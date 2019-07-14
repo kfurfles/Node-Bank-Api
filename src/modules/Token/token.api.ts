@@ -1,7 +1,7 @@
 const { tokenValidator } = require('../../utils/tokenGenerator')
 
 const tokenChecker = async (req, res, next) => {
-    let token = req.headers['x-access-token'];
+    let token = req.headers['Authorization'];
     try {
         let tokenChecked = await tokenValidator(token);
         req.token = tokenChecked;

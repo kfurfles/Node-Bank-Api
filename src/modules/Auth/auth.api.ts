@@ -15,7 +15,6 @@ const authUser = async (req, res) =>{
         }
 
         cpf = cpf.replace(/(\.)?(\-)?/ig,'')
-        cpf = cpf.replace(/([\d]{3})([\d]{3})([\d]{3})([\d]{2})/ig,'$1.$2.$3-$04')
         const user = await authDAO.getUserDao(cpf)
         if (!user) return errorRespose() 
         const checked = await decrypt(password, user.password)
