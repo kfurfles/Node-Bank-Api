@@ -1,7 +1,7 @@
 import { Launchtype } from './../../core/typings/ILaunch';
 import launchsDao from './launchs.dao';
 import userDao from '../User/user.dao'; 
-import { CustomError, newError } from '../../utils/errors';
+import { newError, CustomError } from '../../utils/errors';
 import requestValidators from '../../utils/requestValidators';
 
 export interface IRequest{
@@ -65,19 +65,21 @@ const listById = async(req, res) => {
         const{ days = 30, startDate = defaultDate } = req.query
         
         if (days < 1) {
-            const myError = new CustomError();
-            myError.code = 400
-            myError.message = 'minimun value to this param is 1'
-            throw myError
+            throw  {
+                custom: true,
+                message: newError({
+                    message: 'minimun value to param {days} is 1'
+                })
+            }
         }
         let findedlaunchs = await launchsDao.findLaunchByDateRange(id, days, new Date(startDate))
         res.status(200).json(findedlaunchs)   
     } catch (error) {
-        if (error instanceof CustomError) {
-            res.status(error.code).json({ error: error.message })
+        if (error.hasOwnProperty('custom')) {
+            res.status(400).json(error.message)
         }
         else{
-            res.status(500).json({ error: error.message })
+            res.status(500).json(error)
         }
     }
 }
