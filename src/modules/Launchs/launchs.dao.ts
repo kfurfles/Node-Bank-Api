@@ -49,12 +49,14 @@ const findLaunchByDate = async(idUser: string, dateLaunch: Date) => {
     return SchemaLaunch.findOne({ idUser, date: dateLaunch }) 
 }
 
-const findLaunchByDateRange = async(idUser: string, nDias: number = 30) => {
+const findLaunchByDateRange = async(idUser: string, nDias: number = 30, initialDate = new Date()) => {
     try {
+        initialDate.setHours(0,0,0,0)
+        initialDate.setDate(initialDate.getDate()+1)
         var query = { 
             date: { 
-                $lt: new Date().toISOString(),
-                $gte: new Date(new Date().setDate(new Date().getDate()-nDias)).toISOString()
+                $lt: initialDate.toISOString(),
+                $gte: new Date(new Date().setDate(initialDate.getDate()-nDias)).toISOString()
             },
             idUser: idUser 
         }

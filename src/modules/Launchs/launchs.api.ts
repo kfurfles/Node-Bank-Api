@@ -1,7 +1,8 @@
 import { Launchtype } from './../../core/typings/ILaunch';
 import launchsDao from './launchs.dao';
 import userDao from '../User/user.dao'; 
-import { CustomError } from '../../utils/errors';
+import { CustomError, newError } from '../../utils/errors';
+import requestValidators from '../../utils/requestValidators';
 
 export interface IRequest{
     name: string
@@ -13,20 +14,32 @@ export interface IRequest{
 const create = async (req, res) =>{
     const { id } = req.params
     let launchItems : IRequest[]
-    if(Array.isArray(launchItems)) {
-        ({ body: launchItems } = req)
+    const body = req.body
+
+    const validation = requestValidators(req.body,['name','date','type','value'])
+    
+    if (!validation.status) {
+        res.status(401).json(newError({ message: validation.message }))
+        return;
+    }
+    if(Array.isArray(body)) {
+        launchItems = body
     }else {
-        launchItems = [req.body]
+        launchItems = [body]
     }
     try {
         const requestedLaunchs = launchItems.map((launch: IRequest,i) => async () =>{
             const user : any = await userDao.getUserById(id) 
+            if (!user) {
+                res.status(404).json(newError({ message: 'user not found' }))
+                return;
+            }
             launch.value = parseFloat(launch.value.toString().replace(',','.')) 
             let findedlaunch = await launchsDao.findLaunchByDate(id, launch.date)
+            
             if (findedlaunch) {
                 const updated = launchsDao.updateLaunchUserDAO(id, user.account.amount,launch, findedlaunch)
                 return updated
-                //  throw 'No Implemented'
             } else {
                 let newlaunch = await launchsDao.createLaunchUserDAO(id, user.account.amount,launch)
                 return newlaunch
@@ -34,7 +47,6 @@ const create = async (req, res) =>{
         })
         
         const response = await Promise.all(requestedLaunchs.map(f => f()))
-        console.log(response,'response')
         res.status(200).json(response)
 
         
@@ -47,15 +59,18 @@ const create = async (req, res) =>{
 
 const listById = async(req, res) => {
     try {
+        const d = new Date();
+        const defaultDate = `${d.getMonth()+1}-${d.getDate()}-${d.getFullYear()}`
         const { id } = req.params
-        const{ days = 30 } = req.query
+        const{ days = 30, startDate = defaultDate } = req.query
+        
         if (days < 1) {
             const myError = new CustomError();
             myError.code = 400
             myError.message = 'minimun value to this param is 1'
             throw myError
         }
-        let findedlaunchs = await launchsDao.findLaunchByDateRange(id, days)
+        let findedlaunchs = await launchsDao.findLaunchByDateRange(id, days, new Date(startDate))
         res.status(200).json(findedlaunchs)   
     } catch (error) {
         if (error instanceof CustomError) {
