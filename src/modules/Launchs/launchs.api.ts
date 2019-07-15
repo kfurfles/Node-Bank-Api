@@ -39,7 +39,7 @@ const create = async (req, res) =>{
             
             let result
             if (findedlaunch) {
-                result = launchsDao.updateLaunchUserDAO(id, user.account.amount,launch, findedlaunch)
+                result = await launchsDao.updateLaunchUserDAO(id, user.account.amount,launch, findedlaunch)
             } else {
                 result = await launchsDao.createLaunchUserDAO(id, user.account.amount,launch)
             }
@@ -47,9 +47,11 @@ const create = async (req, res) =>{
             user = await userDao.getUserById(id)
 
             req.io.emit(`updated:${id}`, user)
+            return result
         })
         
         const response = await Promise.all(requestedLaunchs.map(f => f()))
+        console.log(response)
         res.status(200).json(response)
 
         

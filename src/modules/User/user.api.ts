@@ -28,11 +28,6 @@ const create = async (req, res) =>{
     }
 }
 
-const updateAmountUser = async (userId, newValue) =>{
-    const user = userDAO.updateUserDAO(userId, { account: { amount: newValue }})
-    return user   
-}
-
 const list = async (req, res) => {
     try {
         const listUsers = await userDAO.listUsersDAO()
@@ -61,8 +56,26 @@ const userByCpf = async (req, res) =>{
         return 
     }
 }
+
+const getAmuntByUserId = async(req, res) =>{
+    try {
+        const { id } = req.params
+        const findedUser = await userDAO.getUserById(id)
+        if (findedUser) {
+            const { account: { amount } } = findedUser
+            res.status(200).json({ amount })
+        } else {
+            res.status(404).json(newError({
+                message: 'user not found'
+            }))
+        }
+    } catch (error) {
+        res.status(500).json(error)
+    }
+}
 module.exports = {
     create,
     list,
-    userByCpf
+    userByCpf,
+    getAmuntByUserId
 }
