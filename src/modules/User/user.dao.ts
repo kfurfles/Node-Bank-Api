@@ -30,7 +30,7 @@ const getUserById = async (id) =>{
 }
 
 const getUserByAccount = async (idAccount) =>{
-    return await UserSchema.find({ 'account.number': idAccount })
+    return await UserSchema.findOne({ 'account.number': idAccount })
 }
 
 const getUserByCpf = async (cpfNumber) =>{

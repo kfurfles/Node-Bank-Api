@@ -38,8 +38,8 @@ export class Launch implements ILaunch {
         
         this.launchList.push(newLaunchItem)
         this.amount = user.account.amount
-        
-        await userDao.updateUserDAO(this.idUser, { account: { amount: user.account.amount } })
+        const { amount, number } = user.account
+        await userDao.updateUserDAO(this.idUser, { account: { amount, number } })
     }
 }
 

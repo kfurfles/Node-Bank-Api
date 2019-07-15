@@ -2,6 +2,8 @@ import { Launchtype } from '../../core/typings/ILaunch';
 import userDao from '../User/user.dao'; 
 import { newError } from '../../utils/errors';
 import requestValidators from '../../utils/requestValidators';
+import launchsDao from '../Launchs/launchs.dao';
+import { User } from 'src/core/models/User';
 
 export interface IRequest{
     name: string
@@ -14,9 +16,10 @@ const create = async (req, res) =>{
     const { id } = req.params
     try {
         const validation = requestValidators(req.body,['destinyAccount','value'])
-        const { destinyAccount, value : valueToTransfer } = req.body
-        
-        const originUser = await userDao.getUserById(id)
+        const { destinyAccount } = req.body
+        let { value : valueToTransfer } = req.body
+        valueToTransfer = parseFloat(valueToTransfer.replace(',','.')) 
+        const originUser : User = await userDao.getUserById(id)
 
         if (!originUser) {
             res.status(409).json(newError({ 
@@ -24,7 +27,7 @@ const create = async (req, res) =>{
             }))
             return;
         }
-        const destinyUser = await userDao.getUserByAccount(destinyAccount)
+        const destinyUser : User = await userDao.getUserByAccount(destinyAccount)
         if (!destinyUser) {
             res.status(409).json(newError({ 
                 message: 'destiny user not found'
@@ -39,7 +42,36 @@ const create = async (req, res) =>{
             return;
         }
 
-        return res.json('')
+        const latestLaunchs = {
+            origin: {
+                launch: await launchsDao.latestLaunchByUserId(originUser.id),
+                launchItem: {}
+            },
+            destiny: {
+                launch: await launchsDao.latestLaunchByUserId(destinyUser.id),
+                launchItem: {}
+            }
+        }
+
+        
+
+        if (latestLaunchs.origin.launch) {
+            const { origin: { launchItem } } = latestLaunchs
+            launchItem['name'] = `TRANSFER CPF: ${destinyUser.cpf.slice(0,5) + '...'}`
+            // launchItem['date'] = new Date(launch.date)
+            launchItem['type'] = Launchtype.DEBIT
+            launchItem['value'] = valueToTransfer
+            // launchsDao.updateLaunchUserDAO(originUser.id,0)
+        } else {
+            const { origin: { launchItem } } = latestLaunchs
+            launchItem['name'] = `TRANSFER CPF: ${destinyUser.cpf.slice(0,5) + '...'}`
+            // launchItem['date'] = new Date(launch.date)
+            launchItem['type'] = Launchtype.DEBIT
+            launchItem['value'] = valueToTransfer
+        }
+
+        return res.json(latestLaunchs)
+
     } catch (error) {
         
     }
