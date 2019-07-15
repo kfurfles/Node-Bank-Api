@@ -7,7 +7,8 @@ export class User implements IUser {
     password: string
     id: string
     account: {
-        amount: number
+        amount: number,
+        number: string
     }
     constructor(name, email, cpf, password){
         this.name = name

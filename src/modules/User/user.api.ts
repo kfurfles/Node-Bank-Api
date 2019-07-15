@@ -42,7 +42,27 @@ const list = async (req, res) => {
     }
 }
 
+const userByCpf = async (req, res) =>{
+    try {
+        const { cpf } = req.params
+
+        const findedUser = await userDAO.getUserByCpf(cpf)
+        if (findedUser) {
+            res.status(200).json(findedUser)
+            return
+        } else {
+            res.status(404).json(newError({
+                message: 'user not found'
+            }))
+            return
+        }
+    } catch (error) {
+        res.status(500).json(error)
+        return 
+    }
+}
 module.exports = {
     create,
-    list
+    list,
+    userByCpf
 }

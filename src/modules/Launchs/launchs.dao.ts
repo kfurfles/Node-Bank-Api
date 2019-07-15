@@ -66,9 +66,14 @@ const findLaunchByDateRange = async(idUser: string, nDias: number = 30, initialD
     }
 }
 
+const latestLaunchByUserId = async (idUser) =>{
+    return await SchemaLaunch.findOne({ idUser: idUser }, { sort: { date: -1 }})
+}
+
 export default {
     createLaunchUserDAO,
     findLaunchByDate,
     findLaunchByDateRange,
-    updateLaunchUserDAO
+    updateLaunchUserDAO,
+    latestLaunchByUserId
 }

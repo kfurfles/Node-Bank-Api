@@ -4,7 +4,8 @@ export interface IUser {
     cpf: string
     password: string
     account: {
-        amount: number
+        amount: number,
+        number: string
     },
     id: string
 }

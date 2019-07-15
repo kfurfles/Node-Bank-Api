@@ -8,7 +8,8 @@ const UserSchema = new Schema({
     cpf: { type : String , unique : true },
     password: String,
     account: {
-        amount: Number
+        amount: Number,
+        number: mongoose.Types.ObjectId
     }
 },{
     timestamps: true
