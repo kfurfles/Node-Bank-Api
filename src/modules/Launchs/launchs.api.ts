@@ -29,7 +29,7 @@ const create = async (req, res) =>{
     }
     try {
         const requestedLaunchs = launchItems.map((launch: IRequest,i) => async () =>{
-            const user : any = await userDao.getUserById(id) 
+            let user : any = await userDao.getUserById(id) 
             if (!user) {
                 res.status(404).json(newError({ message: 'user not found' }))
                 return;
@@ -37,13 +37,16 @@ const create = async (req, res) =>{
             launch.value = parseFloat(launch.value.toString().replace(',','.')) 
             let findedlaunch = await launchsDao.findLaunchByDate(id, launch.date)
             
+            let result
             if (findedlaunch) {
-                const updated = launchsDao.updateLaunchUserDAO(id, user.account.amount,launch, findedlaunch)
-                return updated
+                result = launchsDao.updateLaunchUserDAO(id, user.account.amount,launch, findedlaunch)
             } else {
-                let newlaunch = await launchsDao.createLaunchUserDAO(id, user.account.amount,launch)
-                return newlaunch
+                result = await launchsDao.createLaunchUserDAO(id, user.account.amount,launch)
             }
+
+            user = await userDao.getUserById(id)
+
+            req.io.emit(`updated:${id}`, user)
         })
         
         const response = await Promise.all(requestedLaunchs.map(f => f()))

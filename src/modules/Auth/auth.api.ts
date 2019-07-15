@@ -25,7 +25,8 @@ const authUser = async (req, res) =>{
                 id: user.id,
                 email: user.email,
                 cpf: user.cpf,
-                idAccount:  user.idAccount
+                name: user.name,
+                idAccount:  user.account.number
             })
             return res.status(200).json({ token })
         }

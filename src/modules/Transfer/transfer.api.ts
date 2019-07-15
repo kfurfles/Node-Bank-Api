@@ -100,10 +100,6 @@ function getIsNewest(
     return originData > destinyData ? origin.date : destiny.date
 }
 
-function prepateToSendLaunch(idUser, launchItem){
-
-}
-
 module.exports = {
     create,
 }
