@@ -5,44 +5,52 @@ import { ILaunch } from 'src/core/typings/ILaunch';
 const SchemaLaunch = require('../Launchs/launchs.schema')
 
 const createLaunchUserDAO = async (idUser: string, userAccount, requestLaunchItem : IRequest) =>{
+    try {
+        const newLaunch = new Launch(idUser, userAccount, requestLaunchItem.date)
+        const item = { 
+            name: requestLaunchItem.name,
+            type: requestLaunchItem.type,
+            value: requestLaunchItem.value
+        }
+        await newLaunch.addLaunch(item)
+        
+        let createdLaunch = new SchemaLaunch({
+            ...newLaunch
+        })
     
-    const newLaunch = new Launch(idUser, userAccount, requestLaunchItem.date)
-    const item = { 
-        name: requestLaunchItem.name,
-        type: requestLaunchItem.type,
-        value: requestLaunchItem.value
+        return await createdLaunch.save()
+    } catch (error) {
+        return error
     }
-    await newLaunch.addLaunch(item)
-    
-    let createdLaunch = new SchemaLaunch({
-        ...newLaunch
-    })
-
-    return await createdLaunch.save()
 }
 
 const updateLaunchUserDAO = async (idUser: string, userAccount, requestLaunchItem : IRequest, findedLaunch: ILaunch) =>{
-    const newLaunch = new Launch(idUser, userAccount, requestLaunchItem.date, findedLaunch.launchList)
-
-    const item = { 
-        name: requestLaunchItem.name,
-        type: requestLaunchItem.type,
-        value: requestLaunchItem.value
-    }
-
-    await newLaunch.addLaunch(item)
-    const { 
-        launchList,
-        amount
-    } = newLaunch
+    try {
+        const newLaunch = new Launch(idUser, userAccount, requestLaunchItem.date, findedLaunch.launchList)
     
-    return await SchemaLaunch.findOneAndUpdate({ _id: findedLaunch.id },
-                                    {$set: 
-                                        {
-                                            launchList,
-                                            amount
-                                        }
-                                    }, {new: true},)
+        const item = { 
+            name: requestLaunchItem.name,
+            type: requestLaunchItem.type,
+            value: requestLaunchItem.value
+        }
+    
+        await newLaunch.addLaunch(item)
+        const { 
+            launchList,
+            amount
+        } = newLaunch
+        
+        return await SchemaLaunch.findOneAndUpdate({ _id: findedLaunch.id },
+                                        {$set: 
+                                            {
+                                                launchList,
+                                                amount
+                                            }
+                                        }, {new: true},)
+        
+    } catch (error) {
+        return error
+    }
 }
 
 const findLaunchByDate = async(idUser: string, dateLaunch: Date) => {
@@ -70,8 +78,22 @@ const latestLaunchByUserId = async (idUser) =>{
     return await SchemaLaunch.findOne({ idUser: idUser }).sort({date: '-1'})
 }
 
-const upSertLaunch = async(idUser, requestLaunchItem) => {
+const upSertLaunch = async(idUser, launch) => {
+    try {
+        launch.value = parseFloat(launch.value.toString().replace(',','.')) 
+        let findedlaunch = await findLaunchByDate(idUser, launch.date)
 
+        if (findedlaunch) {
+            const updated = await updateLaunchUserDAO(idUser, 0,launch, findedlaunch)
+            return updated
+        } else {
+            let newlaunch = await createLaunchUserDAO(idUser, 0,launch)
+            return newlaunch
+        }
+    } catch (error) {
+        console.log(error)
+        return error
+    }
 }
 
 export default {
@@ -79,5 +101,6 @@ export default {
     findLaunchByDate,
     findLaunchByDateRange,
     updateLaunchUserDAO,
-    latestLaunchByUserId
+    latestLaunchByUserId,
+    upSertLaunch
 }

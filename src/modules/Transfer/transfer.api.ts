@@ -42,6 +42,13 @@ const create = async (req, res) =>{
             return;
         }
 
+        if (valueToTransfer <= 0) {
+            res.status(409).json(newError({ 
+                message: 'this value is not allowed'
+            }))
+            return;
+        }
+
         const latestLaunchs = {
             origin: {
                 launch: await launchsDao.latestLaunchByUserId(originUser.id),
@@ -53,28 +60,48 @@ const create = async (req, res) =>{
             }
         }
 
+        const newestDate = getIsNewest(latestLaunchs.origin,latestLaunchs.destiny)
+
+        const { origin: {  launchItem: originLaunchItem } } = latestLaunchs
+        originLaunchItem['name'] = `SENDED TRANSFER CPF: ${destinyUser.cpf.slice(0,5) + '...'}`
+        originLaunchItem['date'] = new Date(newestDate)
+        originLaunchItem['type'] = Launchtype.DEBIT
+        originLaunchItem['value'] = valueToTransfer
         
+        const { destiny: {  launchItem: destinyLaunchItem } } = latestLaunchs
+        destinyLaunchItem['name'] = `RECEIVED TRANSFER CPF: ${originUser.cpf.slice(0,5) + '...'}`
+        destinyLaunchItem['date'] = new Date(newestDate)
+        destinyLaunchItem['type'] = Launchtype.CREDIT
+        destinyLaunchItem['value'] = valueToTransfer
+        
+        const result = await Promise.all([
+            launchsDao.upSertLaunch(originUser.id, latestLaunchs.origin.launchItem),
+            launchsDao.upSertLaunch(destinyUser.id, latestLaunchs.destiny.launchItem)
+        ])
 
-        if (latestLaunchs.origin.launch) {
-            const { origin: { launchItem } } = latestLaunchs
-            launchItem['name'] = `TRANSFER CPF: ${destinyUser.cpf.slice(0,5) + '...'}`
-            // launchItem['date'] = new Date(launch.date)
-            launchItem['type'] = Launchtype.DEBIT
-            launchItem['value'] = valueToTransfer
-            // launchsDao.updateLaunchUserDAO(originUser.id,0)
-        } else {
-            const { origin: { launchItem } } = latestLaunchs
-            launchItem['name'] = `TRANSFER CPF: ${destinyUser.cpf.slice(0,5) + '...'}`
-            // launchItem['date'] = new Date(launch.date)
-            launchItem['type'] = Launchtype.DEBIT
-            launchItem['value'] = valueToTransfer
-        }
-
-        return res.json(latestLaunchs)
+        res.json(result) 
 
     } catch (error) {
-        
+        res.status(500).json(error)
     }
+}
+
+function getIsNewest(
+        { launch: origin }, 
+        { launch: destiny }
+    ){
+    let originData = origin.date ? new Date(origin.date).getTime() : false
+    let destinyData = destiny && destiny['date'] ? new Date(destiny.date).getTime() : false
+
+    if (!destinyData) {
+        return origin.date
+    }
+
+    return originData > destinyData ? origin.date : destiny.date
+}
+
+function prepateToSendLaunch(idUser, launchItem){
+
 }
 
 module.exports = {
