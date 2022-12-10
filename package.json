@@ -30,7 +30,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "encrypt": "0.0.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jest": "24.7.1",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
